@@ -16,16 +16,41 @@
       "id": "3a32ff0f-a058-4590-a4da-35d1935d06ce",
       "name": "Webhook",
       "webhookId": "ff10fe0b-158e-4b92-bbb2-166a31186b18"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json.body;\n\nreturn [\n  {\n    json: {\n      name: data.name,\n      email: data.email,\n      message: data.message,\n      processed: true,\n      processedAt: new Date().toISOString()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        -16
+      ],
+      "id": "175fe838-7d51-4214-b2cd-8d7908500596",
+      "name": "Code in JavaScript"
     }
   ],
   "pinData": {},
-  "connections": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
   "active": false,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "837ccd30-484c-45d8-925d-c33b0c7aba0e",
+  "versionId": "d017029b-686e-4491-9b33-db7e84d8fa1e",
   "meta": {
     "instanceId": "32b0946cb65668675e9279eb5b7da0f1592c5e47baf313b8941eb15db508aa2d"
   },
