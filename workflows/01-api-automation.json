@@ -19,7 +19,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const data = $input.first().json.body;\n\nreturn [\n  {\n    json: {\n      name: data.name,\n      email: data.email,\n      message: data.message,\n      processed: true,\n      processedAt: new Date().toISOString()\n    }\n  }\n];"
+        "jsCode": "const data = $input.first().json.body;\n\nreturn [\n  {\n    json: {\n      name: data.name,\n      email: data.email,\n      message: data.message,\n      userId: 1,\n      processed: true,\n      processedAt: new Date().toISOString()\n    }\n  }\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -29,6 +29,20 @@
       ],
       "id": "175fe838-7d51-4214-b2cd-8d7908500596",
       "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "=https://jsonplaceholder.typicode.com/users/{{ $json.userId }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -224,
+        -16
+      ],
+      "id": "d500a864-6538-45a5-9b89-95be60256af1",
+      "name": "HTTP Request"
     }
   ],
   "pinData": {},
@@ -43,6 +57,17 @@
           }
         ]
       ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -50,7 +75,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "d017029b-686e-4491-9b33-db7e84d8fa1e",
+  "versionId": "4babce7f-4f69-4bf1-8bfd-2aa86eabe5c4",
   "meta": {
     "instanceId": "32b0946cb65668675e9279eb5b7da0f1592c5e47baf313b8941eb15db508aa2d"
   },
