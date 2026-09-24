@@ -43,6 +43,19 @@
       ],
       "id": "d500a864-6538-45a5-9b89-95be60256af1",
       "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const apiData = $input.first().json;\nconst webhookData = $('Webhook').first().json.body;\n\nreturn [\n  {\n    json: {\n      cliente: webhookData.name,\n      email: webhookData.email,\n      mensagem: webhookData.message,\n\n      usuario_api: apiData.name,\n      empresa: apiData.company.name,\n\n      processado: true,\n      processadoAt: new Date().toISOString()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "82ada7f1-31f6-4464-bc12-26f81c5c5769",
+      "name": "Code in JavaScript1"
     }
   ],
   "pinData": {},
@@ -68,6 +81,17 @@
           }
         ]
       ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -75,7 +99,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "4babce7f-4f69-4bf1-8bfd-2aa86eabe5c4",
+  "versionId": "00363a17-e0c1-452b-a430-7f9b434b2f71",
   "meta": {
     "instanceId": "32b0946cb65668675e9279eb5b7da0f1592c5e47baf313b8941eb15db508aa2d"
   },
