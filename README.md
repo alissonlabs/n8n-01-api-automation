@@ -1,97 +1,92 @@
-# n8n API Automation
+# Etapa 5 — Consolidação dos dados
 
-Projeto desenvolvido para demonstrar conhecimentos práticos em automação de APIs utilizando **n8n**, Webhooks, JavaScript, REST APIs e integração entre diferentes sistemas.
+Depois de realizar a requisição para a API externa, o workflow possui duas fontes de informação:
 
-O projeto está sendo construído de forma incremental, com cada etapa documentada e versionada utilizando Git e GitHub.
+1. Os dados enviados originalmente pelo Webhook;
+2. Os dados retornados pela API externa.
 
----
+O HTTP Request passa a fornecer os dados da API no `$json` atual. Porém, os dados originais do Webhook não estão mais diretamente disponíveis nesse `$json`.
 
-## Objetivo
+Para recuperar essas informações, o n8n permite acessar diretamente outro node através do seu nome.
 
-Construir uma automação capaz de:
+Foi utilizado:
 
-1. Receber dados através de um Webhook;
-2. Processar e transformar esses dados;
-3. Gerar informações utilizadas dinamicamente no fluxo;
-4. Realizar uma requisição para uma API externa;
-5. Receber e trabalhar com os dados retornados pela API;
-6. Evoluir posteriormente para uma integração mais próxima de um cenário real de negócio.
-
----
-
-## Tecnologias
-
-* n8n
-* Docker
-* PostgreSQL
-* REST API
-* Webhooks
-* HTTP
-* JSON
-* JavaScript
-* Git
-* GitHub
-
----
-
-## Arquitetura atual
-
-```text
-Webhook
-   ↓
-Code
-   ↓
-HTTP Request
-   ↓
-API externa
-   ↓
-Dados retornados
+```javascript
+const apiData = $input.first().json;
+const webhookData = $('Webhook').first().json.body;
 ```
 
----
+Nesse código:
 
-# Etapa 1 — Webhook
-
-O primeiro componente do workflow é um **Webhook**.
-
-Um webhook permite que um sistema externo envie uma requisição HTTP para uma URL quando determinado evento acontece.
-
-Neste projeto, o Webhook está configurado para receber requisições:
-
-```text
-POST /api-automation
-```
-
-Durante o desenvolvimento, o n8n disponibiliza uma **Test URL**, utilizada enquanto o workflow está aguardando um evento de teste.
-
-### Exemplo de requisição
-
-O teste foi realizado utilizando PowerShell:
-
-```powershell
-$body = @{
-    name = "Alisson"
-    email = "alisson@example.com"
-    message = "Meu primeiro teste com n8n"
-} | ConvertTo-Json
-
-Invoke-RestMethod `
-    -Uri "http://localhost:5678/webhook-test/api-automation" `
-    -Method POST `
-    -ContentType "application/json" `
-    -Body $body
-```
+* `$input.first().json` representa os dados recebidos do node anterior, neste caso o HTTP Request;
+* `$('Webhook')` referencia diretamente o node chamado `Webhook`;
+* `.first()` seleciona o primeiro item produzido pelo node;
+* `.json.body` acessa o payload originalmente recebido pelo Webhook.
 
 ---
 
-# O que é um Payload?
+## Consolidação
 
-Payload é o conjunto de dados transportado por uma requisição.
+Os dados das duas fontes são então combinados em um novo objeto:
 
-Neste exemplo, o payload enviado pelo cliente é:
+```javascript
+return [
+  {
+    json: {
+      cliente: webhookData.name,
+      email: webhookData.email,
+      mensagem: webhookData.message,
+
+      usuario_api: apiData.name,
+      empresa: apiData.company.name,
+
+      processado: true,
+      processadoAt: new Date().toISOString()
+    }
+  }
+];
+```
+
+O resultado final passa a reunir informações provenientes dos dois sistemas:
 
 ```json
 {
-  "name": "Alisson",
-  "email": "alisson@example.
+  "cliente": "Alisson",
+  "email": "alisson@example.com",
+  "mensagem": "Meu primeiro teste com n8n",
+  "usuario_api": "Leanne Graham",
+  "empresa": "Romaguera-Crona",
+  "processado": true,
+  "processadoAt": "2026-..."
+}
+```
+
+### Por que essa etapa é importante?
+
+Em integrações reais, frequentemente precisamos:
+
+* receber dados de um sistema;
+* consultar outro sistema;
+* cruzar as informações;
+* transformar os dados;
+* produzir uma nova estrutura para o próximo processo.
+
+Neste workflow, o n8n está fazendo exatamente esse tipo de integração.
+
+A arquitetura passou a ser:
+
+```text
+Sistema externo
+      ↓
+   Webhook
+      ↓
+Processamento
+      ↓
+  HTTP Request
+      ↓
+   API externa
+      ↓
+Consolidação
+      ↓
+ Resultado final
 ```
